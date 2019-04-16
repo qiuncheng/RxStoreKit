@@ -1,6 +1,6 @@
 # RxStoreKit
 
-[![CI Status](https://img.shields.io/travis/mdj940619@163.com/RxStoreKit.svg?style=flat)](https://travis-ci.org/mdj940619@163.com/RxStoreKit)
+[![CI Status](https://img.shields.io/travis/qiuncheng/RxStoreKit.svg?style=flat)](https://travis-ci.org/qiuncheng/RxStoreKit)
 [![Version](https://img.shields.io/cocoapods/v/RxStoreKit.svg?style=flat)](https://cocoapods.org/pods/RxStoreKit)
 [![License](https://img.shields.io/cocoapods/l/RxStoreKit.svg?style=flat)](https://cocoapods.org/pods/RxStoreKit)
 [![Platform](https://img.shields.io/cocoapods/p/RxStoreKit.svg?style=flat)](https://cocoapods.org/pods/RxStoreKit)
@@ -22,7 +22,7 @@ pod 'RxStoreKit'
 
 ## Author
 
-mdj940619@163.com, qiuncheng@gmail.com
+qiuncheng, qiuncheng@gmail.com
 
 ## License
 

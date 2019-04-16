@@ -2,8 +2,8 @@
 //  AppDelegate.swift
 //  RxStoreKit
 //
-//  Created by mdj940619@163.com on 04/16/2019.
-//  Copyright (c) 2019 mdj940619@163.com. All rights reserved.
+//  Created by qiuncheng on 04/16/2019.
+//  Copyright (c) 2019 qiuncheng. All rights reserved.
 //
 
 import UIKit
