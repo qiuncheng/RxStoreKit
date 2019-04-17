@@ -1,27 +1,36 @@
 PODS:
-  - Nimble (7.0.3)
-  - Quick (1.2.0)
-  - RxStoreKit (0.1.0)
+  - Nimble (8.0.1)
+  - Quick (2.0.0)
+  - RxCocoa (4.5.0):
+    - RxSwift (>= 4.4.2, ~> 4.4)
+  - RxStoreKit (0.1.0):
+    - RxCocoa
+    - RxSwift
+  - RxSwift (4.5.0)
 
 DEPENDENCIES:
-  - Nimble (~> 7.0.2)
-  - Quick (~> 1.2.0)
+  - Nimble
+  - Quick
   - RxStoreKit (from `../`)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - Nimble
     - Quick
+    - RxCocoa
+    - RxSwift
 
 EXTERNAL SOURCES:
   RxStoreKit:
     :path: "../"
 
 SPEC CHECKSUMS:
-  Nimble: 7f5a9c447a33002645a071bddafbfb24ea70e0ac
-  Quick: 58d203b1c5e27fff7229c4c1ae445ad7069a7a08
-  RxStoreKit: 3a2fc1da2eff20a760c6889f8596e84006b8093e
+  Nimble: 45f786ae66faa9a709624227fae502db55a8bdd0
+  Quick: ce1276c7c27ba2da3cb2fd0cde053c3648b3b22d
+  RxCocoa: cbf70265dc65a981d4ac982e513c10cf23df24a0
+  RxStoreKit: 1f15740c5886291d303ca0df0cc06fea356dbc1e
+  RxSwift: f172070dfd1a93d70a9ab97a5a01166206e1c575
 
-PODFILE CHECKSUM: 9f1a195303b232b898aa9acc7c2fa11391f7b2b1
+PODFILE CHECKSUM: 1154ec0f091ec7fcb7e3f46520291baba794e63e
 
 COCOAPODS: 1.6.1

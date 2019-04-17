@@ -1,20 +1,7 @@
+excluded: # 执行 linting 时忽略的路径。 优先级比 `included` 更高。
+  - Carthage
+  - Pods
 disabled_rules:
-  - type_name
-  - identifier_name
-  - todo
-  - nesting
-  - vertical_whitespace
+  - line_length
   - trailing_whitespace
   - function_body_length
-
-included:
-  - VVExtensions
-  - VVExtensionsTests
-
-line_length: 200
-
-cyclomatic_complexity: 50
-
-type_body_length:
-  - 300
-  - 400
