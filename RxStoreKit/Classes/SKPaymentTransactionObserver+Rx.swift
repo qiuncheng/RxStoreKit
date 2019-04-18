@@ -52,6 +52,18 @@ fileprivate class Observer: NSObject, SKPaymentTransactionObserver {
     
     func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
         updatedTransactions.onNext(transactions)
+        transactions.forEach { (transaction) in
+            switch transaction.transactionState {
+            case .purchased:
+                SKPaymentQueue.default().finishTransaction(transaction)
+            case .failed:
+                SKPaymentQueue.default().finishTransaction(transaction)
+            case .restored:
+                SKPaymentQueue.default().finishTransaction(transaction)
+            default:
+                break
+            }
+        }
     }
     
     func paymentQueueRestoreCompletedTransactionsFinished(_ queue: SKPaymentQueue) {

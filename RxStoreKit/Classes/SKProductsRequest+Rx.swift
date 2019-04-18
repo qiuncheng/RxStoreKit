@@ -31,45 +31,51 @@ public extension Reactive where Base: SKProductsRequest {
         return Observable.create({ (observer) -> Disposable in
             let disposable = self.base.rx.productsResponse
                 .map({ $0.products })
-                .flatMapLatest({ (products) -> Observable<[SKPaymentTransaction]> in
-                    guard !products.isEmpty else {
+                .subscribe(onNext: { (products) in
+                    if products.isEmpty {
                         observer.onError(RxSKError.productNotFound)
-                        return Observable.empty()
+                        return
                     }
                     products.forEach({
                         let payment = SKPayment(product: $0)
                         SKPaymentQueue.default().add(payment)
                     })
-                    return SKPaymentQueue.observer.rx.updatedTransactions
                 })
+                
+            let disposable1 = SKPaymentQueue.observer.rx.updatedTransactions
                 .subscribe(onNext: { (transactions) in
+                    var needComplete = false
                     for transaction in transactions {
                         switch transaction.transactionState {
                         case .purchased:
-                            SKPaymentQueue.default().finishTransaction(transaction)
                             observer.onNext(transaction)
+                            needComplete = true
                         case .failed:
-                            SKPaymentQueue.default().finishTransaction(transaction)
                             if let error = transaction.error {
                                 observer.onError(error)
                             } else {
                                 observer.onNext(transaction)
                             }
+                            needComplete = true
                         case .restored:
-                            SKPaymentQueue.default().finishTransaction(transaction)
                             observer.onNext(transaction)
+                            needComplete = true
                         default:
                             break
                         }
                     }
-                    observer.onCompleted()
+                    if needComplete {
+                        observer.onCompleted()
+                    }
                 }, onError: { (error) in
                     observer.onError(error)
                 })
+            
             self.base.start()
             
             return Disposables.create {
                 disposable.dispose()
+                disposable1.dispose()
             }
         })
     }
