@@ -21,7 +21,7 @@ extension RxSKPaymentTransactionObserver: ReactiveCompatible { }
 
 extension Reactive where Base: RxSKPaymentTransactionObserver {
    
-    public var updatedTransactions: Observable<SKPaymentTransaction> {
+    public var updatedTransactions: Observable<[SKPaymentTransaction]> {
         return base.observer.updatedTransactions.asObservable()
     }
     
@@ -29,11 +29,11 @@ extension Reactive where Base: RxSKPaymentTransactionObserver {
         return base.observer.restoreCompletedTransactions.asObservable()
     }
     
-    public var updatedDownloads: Observable<SKDownload> {
+    public var updatedDownloads: Observable<[SKDownload]> {
         return base.observer.updatedDownloads.asObservable()
     }
     
-    public var removedTransactions: Observable<SKPaymentTransaction> {
+    public var removedTransactions: Observable<[SKPaymentTransaction]> {
         return base.observer.removedTransactions.asObservable()
     }
     
@@ -44,16 +44,14 @@ extension Reactive where Base: RxSKPaymentTransactionObserver {
 
 fileprivate class Observer: NSObject, SKPaymentTransactionObserver {
     
-    let updatedTransactions = PublishSubject<SKPaymentTransaction>()
+    let updatedTransactions = PublishSubject<[SKPaymentTransaction]>()
     let restoreCompletedTransactions = PublishSubject<Void>()
-    let updatedDownloads = PublishSubject<SKDownload>()
-    let removedTransactions = PublishSubject<SKPaymentTransaction>()
+    let updatedDownloads = PublishSubject<[SKDownload]>()
+    let removedTransactions = PublishSubject<[SKPaymentTransaction]>()
     let restoreCompletedTransactionsFailedWithError = PublishSubject<Error>()
     
     func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
-        transactions.forEach {
-            updatedTransactions.onNext($0)
-        }
+        updatedTransactions.onNext(transactions)
     }
     
     func paymentQueueRestoreCompletedTransactionsFinished(_ queue: SKPaymentQueue) {
@@ -61,15 +59,11 @@ fileprivate class Observer: NSObject, SKPaymentTransactionObserver {
     }
     
     func paymentQueue(_ queue: SKPaymentQueue, updatedDownloads downloads: [SKDownload]) {
-        downloads.forEach {
-            updatedDownloads.onNext($0)
-        }
+        updatedDownloads.onNext(downloads)
     }
     
     func paymentQueue(_ queue: SKPaymentQueue, removedTransactions transactions: [SKPaymentTransaction]) {
-        transactions.forEach {
-            removedTransactions.onNext($0)
-        }
+        removedTransactions.onNext(transactions)
     }
     
     func paymentQueue(_ queue: SKPaymentQueue, restoreCompletedTransactionsFailedWithError error: Error) {

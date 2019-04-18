@@ -9,11 +9,13 @@ import StoreKit
 import RxSwift
 import RxCocoa
 
-public extension Reactive where Base: SKProductsRequest {
-    
-    var observer: RxSKPaymentTransactionObserver {
+public extension SKPaymentQueue {
+    static var observer: RxSKPaymentTransactionObserver {
         return RxSKPaymentTransactionObserver.shared
     }
+}
+
+public extension Reactive where Base: SKProductsRequest {
     
     var delegate: DelegateProxy<SKProductsRequest, SKProductsRequestDelegate> {
         return RxSKProductsRequestDelegateProxy.proxy(for: base)
@@ -25,33 +27,46 @@ public extension Reactive where Base: SKProductsRequest {
             .asObservable()
     }
     
-    func start<H>(_ handler: H) -> Observable<SKPaymentTransaction> where H: SKPaymentQueueHandler {
-        return Observable.create({ [weak base = self.base] (observer) -> Disposable in
-            guard let aBase = base else {
-                observer.onCompleted()
-                return Disposables.create()
-            }
-            
-            let disposable = aBase.rx.productsResponse
-                .flatMap({ (response) -> Observable<SKProduct> in
-                    return Observable.from(response.products)
-                })
-                .map({ (product) -> SKPayment in
-                    return SKPayment(product: product)
-                })
-                .do(onNext: { (payment) in
-                    SKPaymentQueue.default().add(payment)
-                })
-                .withLatestFrom(aBase.rx.observer.rx.updatedTransactions)
-                .flatMapLatest({ (transaction) -> Observable<SKPaymentTransaction> in
-                    switch transaction.transactionState {
-                    case .purchased:
-                        return handler.verifyRequest(transaction: transaction)
-                    default:
-                        return Observable.of(transaction)
+    func start() -> Observable<SKPaymentTransaction> {
+        return Observable.create({ (observer) -> Disposable in
+            let disposable = self.base.rx.productsResponse
+                .map({ $0.products })
+                .flatMapLatest({ (products) -> Observable<[SKPaymentTransaction]> in
+                    guard !products.isEmpty else {
+                        observer.onError(RxSKError.productNotFound)
+                        return Observable.empty()
                     }
+                    products.forEach({
+                        let payment = SKPayment(product: $0)
+                        SKPaymentQueue.default().add(payment)
+                    })
+                    return SKPaymentQueue.observer.rx.updatedTransactions
                 })
-                .subscribe(observer)
+                .subscribe(onNext: { (transactions) in
+                    for transaction in transactions {
+                        switch transaction.transactionState {
+                        case .purchased:
+                            SKPaymentQueue.default().finishTransaction(transaction)
+                            observer.onNext(transaction)
+                        case .failed:
+                            SKPaymentQueue.default().finishTransaction(transaction)
+                            if let error = transaction.error {
+                                observer.onError(error)
+                            } else {
+                                observer.onNext(transaction)
+                            }
+                        case .restored:
+                            SKPaymentQueue.default().finishTransaction(transaction)
+                            observer.onNext(transaction)
+                        default:
+                            break
+                        }
+                    }
+                    observer.onCompleted()
+                }, onError: { (error) in
+                    observer.onError(error)
+                })
+            self.base.start()
             
             return Disposables.create {
                 disposable.dispose()
